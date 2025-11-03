@@ -59,7 +59,6 @@ def init_motion_gen(
     # motion_gen.warmup(batch=batch, warmup_link_poses=True)
     return motion_gen
 
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
@@ -67,10 +66,10 @@ if __name__ == "__main__":
         "-c",
         "--manip_cfg_file",
         type=str,
-        default="fc_leap.yml",
+        default="sim_shadow/tabletop.yml",
         help="config file path",
     )
-
+    
     parser.add_argument(
         "-f",
         "--save_folder",
@@ -78,7 +77,7 @@ if __name__ == "__main__":
         default=None,
         help="If None, use join_path(manip_cfg_file[:-4], $TIME) as save_folder",
     )
-
+    
     parser.add_argument(
         "-m",
         "--save_mode",
@@ -155,7 +154,8 @@ if __name__ == "__main__":
         ):
             log_warn(f"skip {world_info_dict['save_prefix']}")
             continue
-
+        name=world_info_dict["manip_name"]
+        world_info_dict['world_cfg'][0]['mesh'][name[0]]['pose']=np.array([0.2,0,0.3,1,0,0,0])
         world_model = [WorldConfig.from_dict(world_info_dict["world_cfg"][0])]
 
         if grasp_solver is None:
@@ -188,7 +188,7 @@ if __name__ == "__main__":
                 dim=-1,
             )
             all_hand_pose_qpos = torch.cat(
-                [grasp_result.solution, squeeze_pose_qpos.unsqueeze(-2)], dim=-2
+               [grasp_result.solution, squeeze_pose_qpos.unsqueeze(-2)], dim=-2
             )
             world_info_dict["robot_pose"] = all_hand_pose_qpos  # [b, n, q]
             world_info_dict["contact_point"] = grasp_result.contact_point  # [b, n, p, 3]
@@ -255,7 +255,7 @@ if __name__ == "__main__":
         ]
         kin_state = grasp_solver.fk(grasp_pose_qpos)
         ik_result = grasp_solver.ik_solver.solve_batch(
-            kin_state.ee_pose,
+            kin_state.ee_pose, 
             seed_config=pregrasp_arm_qpos.unsqueeze(1),
             retract_config=pregrasp_arm_qpos,
         )

@@ -1,0 +1,86 @@
+collision_link_names:
+  - L_hand_base_link
+  - L_thumb_proximal_base
+  - L_thumb_proximal
+  - L_thumb_intermediate
+  - L_thumb_distal
+  - L_index_proximal
+  - L_index_intermediate
+  - L_middle_proximal
+  - L_middle_intermediate
+  - L_ring_proximal
+  - L_ring_intermediate
+  - L_pinky_proximal
+  - L_pinky_intermediate
+
+collision_spheres:
+  L_hand_base_link:
+  - "center": [0.0, -0.02, 0.0]
+    "radius": 0.022
+  - "center": [-0.0015, -0.06, 0.0]
+    "radius": 0.02
+  - "center": [0.0006, -0.10, 0.015]
+    "radius": 0.015
+  - "center": [0.0006, -0.10, -0.017]
+    "radius": 0.015
+
+  # Thumb: positive X axis points along finger in reverse direction
+  #        positive Y axis points towards thumb tip in reverse direction
+  #        positive Z axis points towards palm normal
+  L_thumb_proximal_base:
+  - "center": [-0.001, 0.0, 0.0]
+    "radius": 0.005
+  
+  L_thumb_proximal:
+  - "center": [0.0, 0.0, -0.005]
+    "radius": 0.01
+  - "center": [0.025, -0.015, -0.005]
+    "radius": 0.01
+  
+  L_thumb_intermediate:
+  - "center": [0.01, -0.005, -0.007]
+    "radius": 0.005
+  
+  L_thumb_distal:
+  - "center": [0.01, -0.003, -0.007]
+    "radius": 0.005
+  
+  L_index_proximal:
+  - "center": [0.0, -0.01, 0.0]
+    "radius": 0.01
+  - "center": [0.0, -0.02, 0.0]
+    "radius": 0.01
+
+  L_index_intermediate:
+  - "center": [0.0, -0.015, 0.0]
+    "radius": 0.009
+  
+  L_middle_proximal:
+  - "center": [0.0, -0.01, 0.0]
+    "radius": 0.01
+  - "center": [0.0, -0.02, 0.0]
+    "radius": 0.01
+  
+  L_middle_intermediate:
+  - "center": [0.0, -0.015, 0.0]
+    "radius": 0.009
+  
+  L_ring_proximal:
+  - "center": [0.0, -0.01, 0.0]
+    "radius": 0.01
+  - "center": [0.0, -0.02, 0.0]
+    "radius": 0.01
+  
+  L_ring_intermediate:
+  - "center": [0.0, -0.015, 0.0]
+    "radius": 0.009
+  
+  L_pinky_proximal:
+  - "center": [0.0, -0.01, 0.0]
+    "radius": 0.009
+  - "center": [0.0, -0.018, 0.0]
+    "radius": 0.009
+  
+  L_pinky_intermediate:
+  - "center": [0.0, -0.012, 0.0]
+    "radius": 0.008

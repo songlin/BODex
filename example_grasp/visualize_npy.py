@@ -68,7 +68,7 @@ if __name__ == "__main__":
     manip_config_data = load_yaml(join_path(get_manip_configs_path(), args.manip_cfg_file))
 
     save_folder = os.path.join(args.manip_cfg_file[:-4], args.path)
-
+    print(save_folder)
     manip_config_data["world"]["type"] = "grasp"
     if args.mode == "grasp":
         manip_config_data["world"]["template_path"] = os.path.join(
