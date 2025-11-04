@@ -127,13 +127,19 @@ class SaveHelper:
 
     def _save_usd(self, save_dict, file_prefix: str):
         save_path = os.path.join(self.save_folder, file_prefix + self.task_name + ".usda")
+        origin_robot_pose = save_dict["robot_pose"].reshape(-1, save_dict["robot_pose"].shape[-1])
+
+        robot_pose = torch.zeros((origin_robot_pose.shape[0], 43), device=origin_robot_pose.device)
+        robot_pose[:,:origin_robot_pose.shape[1]] = origin_robot_pose
+        
+        # robot_pose = JointState.from_position(robot_pose)
 
         UsdHelper.write_trajectory_animation(
             None,
             save_dict["world_model"],
             None,
             JointState.from_position(
-                save_dict["robot_pose"].reshape(-1, save_dict["robot_pose"].shape[-1])
+               robot_pose
             ),
             save_path=save_path,
             kin_model=self.kin_model,

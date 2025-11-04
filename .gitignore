@@ -15,7 +15,7 @@ __pycache__/
 *$py.class
 
 *.json
-
+!.vscode/launch.json
 # C extensions
 *.so
 requirements.txt

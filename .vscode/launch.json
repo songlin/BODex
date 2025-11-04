@@ -1,0 +1,73 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "plan_mogen",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/home/wyt/miniconda3/envs/bodex/bin/python",
+            "program": "${workspaceFolder}/example_grasp/plan_mogen_batch.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--manip_cfg_file=sim_dex3/right.yml",
+                // "--parallel_world=1",
+                // "--skip",
+                // "--save_id=0"
+            ]
+        },
+         {
+            "name": "plan_batch",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/home/wyt/miniconda3/envs/bodex/bin/python",
+            "program": "${workspaceFolder}/example_grasp/plan_batch_env.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--manip_cfg_file=sim_dex3/right.yml",
+                "--parallel_world=1",
+                "--skip",
+                "--save_id=0",
+                
+            ]
+        },
+
+        {
+            "name": "visualize_npy",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/home/wyt/miniconda3/envs/bodex/bin/python",
+            "program": "${workspaceFolder}/example_grasp/visualize_npy.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--manip_cfg_file=sim_dex3/right.yml",
+                "--path=dex3_debug",
+                "--mode=mogen",
+                // "--save_mode=npy",
+                // "--save_data=final_and_mid",
+                // "--save_id=0",
+                // "--save_debug=True",
+            ]
+        },
+
+        {
+            "name": "plan_batch_graspnet",
+            "type": "debugpy",
+            "request": "launch",
+            "python": "/home/wyt/miniconda3/envs/bodex/bin/python",
+            "program": "${workspaceFolder}/example_grasp/plan_batch_graspnet.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--manip_cfg_file=sim_dex3/right.yml",
+                "--parallel_world=1",
+                // "--skip",
+                // "--save_id=0",
+                
+            ]
+        },
+        
+    ]
+}

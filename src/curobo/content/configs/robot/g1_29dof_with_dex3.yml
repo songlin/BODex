@@ -10,9 +10,9 @@ robot_cfg:
         usd_path: null
         base_link: "pelvis"
         ee_link: "right_hand_palm_link" #left_wrist_yaw_link
-        link_names: [ "right_hand_palm_link", "right_hand_index_1_link","right_hand_middle_1_link","right_hand_thumb_2_link",
-                     "left_ankle_roll_link", "right_ankle_roll_link", "left_hand_palm_link", "left_hand_thumb_2_link",
-                      "left_hand_index_1_link", "left_hand_middle_1_link"] # TODO "left_ankle_roll_link", "right_ankle_roll_link"
+        link_names: [ "right_hand_palm_link", "right_hand_index_1_link","right_hand_middle_1_link","right_hand_thumb_2_link",]
+                    #  "left_ankle_roll_link", "right_ankle_roll_link", "left_hand_palm_link", "left_hand_thumb_2_link",
+                    #   "left_hand_index_1_link", "left_hand_middle_1_link"] # TODO "left_ankle_roll_link", "right_ankle_roll_link"
 
         # lock_joints: {"waist_yaw_joint": 0.0, "waist_roll_joint": 0.0, "waist_pitch_joint": 0.0}
 
@@ -34,7 +34,17 @@ robot_cfg:
                 "right_shoulder_yaw_link",
                 "right_elbow_link",
                 "right_wrist_pitch_link",
+
+                "right_hand_palm_link",
+                "right_hand_thumb_0_link",
+                "right_hand_thumb_1_link",
+                "right_hand_thumb_2_link",
+                "right_hand_middle_0_link",
+                "right_hand_middle_1_link",
+                "right_hand_index_0_link",
+                "right_hand_index_1_link",
                 
+
             ]
         collision_spheres: spheres/g1_29dof.yml
         collision_sphere_buffer: 0.005
@@ -127,6 +137,54 @@ robot_cfg:
                 "right_shoulder_yaw_link",
                 "right_elbow_link",
                 "right_wrist_pitch_link",
+            ],
+            "right_hand_palm_link": [
+                "right_hand_palm_link",
+                "right_hand_index_1_link",
+                "right_hand_middle_1_link",
+                "right_hand_thumb_2_link",
+            ],
+            "right_hand_index_1_link": [
+                "right_hand_palm_link",
+                "right_hand_index_1_link",
+                "right_hand_middle_1_link",
+                "right_hand_thumb_2_link",
+            ],
+            "right_hand_middle_1_link": [
+                "right_hand_palm_link",
+                "right_hand_index_1_link",
+                "right_hand_middle_1_link",
+                "right_hand_thumb_2_link",
+            ],
+            "right_hand_thumb_2_link": [
+                "right_hand_palm_link",
+                "right_hand_index_1_link",
+                "right_hand_middle_1_link",
+                "right_hand_thumb_2_link",
+            ],
+            "right_hand_thumb_0_link": [
+                "right_hand_palm_link",
+                "right_hand_index_1_link",
+                "right_hand_middle_1_link",
+                "right_hand_thumb_2_link",
+            ],
+            "right_hand_thumb_1_link": [
+                "right_hand_palm_link",
+                "right_hand_index_1_link",
+                "right_hand_middle_1_link",
+                "right_hand_thumb_2_link",
+            ],
+            "right_hand_middle_0_link": [
+                "right_hand_palm_link",
+                "right_hand_index_1_link",
+                "right_hand_middle_1_link",
+                "right_hand_thumb_2_link",
+            ],
+            "right_hand_index_0_link": [
+                "right_hand_palm_link",
+                "right_hand_index_1_link",
+                "right_hand_middle_1_link",
+                "right_hand_thumb_2_link",
             ],
         }
         self_collision_buffer: {

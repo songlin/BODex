@@ -238,14 +238,26 @@ if __name__ == "__main__":
         file_path=os.path.join(os.getcwd(), "coacd_0.05/coacd_merge.obj")
         urdf_path=os.path.join(os.getcwd(), "coacd_0.05/coacd.urdf")
         obj_pose=_transform_to_robot_frame(np.array([-0.8, 0, 0.04, 1, 0, 0, 0]))
+        # world_cfg=[{"mesh":{"apple":{
+        #     "scale": np.array([1.0, 1.0, 1.0]),
+        #     "pose": obj_pose,
+        #     "file_path": file_path,
+        #     "urdf_path": urdf_path,
+        # }
+            
+        # }}]
+
         world_cfg=[{"mesh":{"apple":{
             "scale": np.array([1.0, 1.0, 1.0]),
             "pose": obj_pose,
             "file_path": file_path,
             "urdf_path": urdf_path,
-        }
-            
-        }}]
+        }},"cuboid": {
+                "table": {
+                    "dims": [0.2, 0.2, 0.2],
+                    "pose": [0.4, 0.0, -0.1, 1, 0, 0, 0.0],
+                }
+            }}]
 
         if grasp_solver is None:
             # grasp_config = GraspSolverConfig.load_from_robot_config(

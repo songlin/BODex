@@ -37,8 +37,21 @@ seed = 123
 np.random.seed(seed)
 torch.manual_seed(seed)
 random.seed(seed)
+import transforms3d as t3d
+import trimesh
 
+def _transform_to_robot_frame(object_pose: np.ndarray) -> list[float]:
+            """ Transform world coordinates to robot frame """
+            T_wr = np.eye(4)
+            T_wr[:3, :3] = t3d.quaternions.quat2mat(  [1. ,  0. ,  0. ,  0.])
+            T_wr[:3, 3] = [0,  0. , -0. ]
+            
+            T_wo = np.eye(4)
+            T_wo[:3, :3] = t3d.quaternions.quat2mat(object_pose[3:])
+            T_wo[:3, 3] = object_pose[:3]
 
+            T_ro = np.linalg.inv(T_wr) @ T_wo
+            return np.concatenate([T_ro[:3, 3], t3d.quaternions.mat2quat(T_ro[:3, :3])], axis=0).tolist()
 def init_motion_gen(
     robot_cfg: Dict,
     world_model: Dict,
@@ -154,26 +167,62 @@ if __name__ == "__main__":
         ):
             log_warn(f"skip {world_info_dict['save_prefix']}")
             continue
-        name=world_info_dict["manip_name"]
-        world_info_dict['world_cfg'][0]['mesh'][name[0]]['pose']=np.array([0.2,0,0.3,1,0,0,0])
-        world_model = [WorldConfig.from_dict(world_info_dict["world_cfg"][0])]
+        file_path=os.path.join(os.getcwd(), "coacd_0.05/coacd_merge.obj")
+        urdf_path=os.path.join(os.getcwd(), "coacd_0.05/coacd.urdf")
+        obj_pose=_transform_to_robot_frame(np.array([0.4, 0, 0.04, 1, 0, 0, 0]))
+        world_cfg=[{"mesh":{"apple":{
+            "scale": np.array([1.0, 1.0, 1.0]),
+            "pose": obj_pose,
+            "file_path": file_path,
+            "urdf_path": urdf_path,
+        }},"cuboid": {
+                "table": {
+                    "dims": [0.4, 0.4, 0.2],
+                    "pose": [0.4, 0.0, -0.1, 1, 0, 0, 0.0],
+                }
+            }}]
+
+        # name=world_info_dict["manip_name"]
+        # world_info_dict['world_cfg'][0]['mesh'][name[0]]['pose']=np.array([0.2,0,0.3,1,0,0,0])
+        # world_model = [WorldConfig.from_dict(world_info_dict["world_cfg"][0])]
+        
 
         if grasp_solver is None:
+            # grasp_config = GraspSolverConfig.load_from_robot_config(
+            #     world_model=world_model,
+            #     manip_name_list=world_info_dict["manip_name"],
+            #     manip_config_data=manip_config_data,
+            #     obj_gravity_center=world_info_dict["obj_gravity_center"],
+            #     obj_obb_length=world_info_dict["obj_obb_length"],
+            #     use_cuda_graph=False,
+            # )
+
             grasp_config = GraspSolverConfig.load_from_robot_config(
-                world_model=world_model,
-                manip_name_list=world_info_dict["manip_name"],
+                world_model=world_cfg,
+                manip_name_list="apple",
                 manip_config_data=manip_config_data,
-                obj_gravity_center=world_info_dict["obj_gravity_center"],
-                obj_obb_length=world_info_dict["obj_obb_length"],
+                obj_gravity_center=torch.tensor([[0.0, 0.0, 0.02]]),
+                obj_obb_length=torch.tensor([0.04]),
                 use_cuda_graph=False,
+                # store_debug=args.save_debug,
             )
             grasp_solver = GraspSolver(grasp_config)
+            world_model = grasp_solver.world_coll_checker.world_model
         else:
+            # grasp_solver.update_world(
+            #     world_model,
+            #     world_info_dict["obj_gravity_center"],
+            #     world_info_dict["obj_obb_length"],
+            #     world_info_dict["manip_name"],
+            # )
+            world_info_dict["world_model"] = world_model = [
+                WorldConfig.from_dict(world_cfg) for world_cfg in world_cfg
+            ]
             grasp_solver.update_world(
                 world_model,
-                world_info_dict["obj_gravity_center"],
-                world_info_dict["obj_obb_length"],
-                world_info_dict["manip_name"],
+                torch.tensor([[0.0, 0.0, 0.02]]),
+                torch.tensor([0.04]),
+                'apple',
             )
 
         # plan grasp
@@ -206,7 +255,10 @@ if __name__ == "__main__":
 
         if "mogen" not in args.task:
             continue
-
+        world_info_dict['manip_name']='apple'
+        world_info_dict['obj_gravity_center'] = torch.tensor([[0.0, 0.0, 0.02]])
+        world_info_dict['obj_obb_length'] = torch.tensor([0.04])
+        world_info_dict['world_cfg'] = world_cfg
         if mg is None:
             mg = init_motion_gen(
                 manip_config_data["robot_file_with_arm"],
@@ -259,6 +311,7 @@ if __name__ == "__main__":
             seed_config=pregrasp_arm_qpos.unsqueeze(1),
             retract_config=pregrasp_arm_qpos,
         )
+        b_success = ik_result.success.squeeze(1)
         log_warn(
             "IK for Grasp Pose Success rate: %.2f"
             % (ik_result.success.int().sum() / len(ik_result.success))
@@ -292,9 +345,28 @@ if __name__ == "__main__":
         )
         robot_pose_traj = torch.cat(robot_pose_traj, dim=1)
 
+        
+        a_success = mogen_result.success
+        c_success = ik_result.success.squeeze(1)
+        all_success = a_success & b_success & c_success
+
+        robot_pose_traj = robot_pose_traj[all_success]
+
+        torch.save(pregrasp_pose_qpos[all_success], "pregrasp_pose_qpos.pt")
+        torch.save(grasp_pose_qpos[all_success], "grasp_pose_qpos.pt")
+
+
+
+
         # save results
         world_info_dict["world_model"] = world_model
-        world_info_dict["robot_pose"] = robot_pose_traj.unsqueeze(0)
-        save_mogen.save_piece(world_info_dict)
+        # world_info_dict["robot_pose"] = robot_pose_traj.unsqueeze(0)
+
+        for i in range(robot_pose_traj.shape[0]):
+            world_info_dict["robot_pose"] = robot_pose_traj[i:i+1].unsqueeze(0)
+            save_mogen.save_piece(world_info_dict)
+            # break
+            pass
+        # save_mogen.save_piece(world_info_dict)
         log_warn(f"Sinlge Time (mogen): {time.time()-smt}")
     log_warn(f"Total Time: {time.time()-tst}")
