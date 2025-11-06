@@ -9,7 +9,7 @@
             "name": "plan_mogen",
             "type": "debugpy",
             "request": "launch",
-            "python": "/home/wyt/miniconda3/envs/bodex/bin/python",
+            "python": "/home/wenke/anaconda3/envs/bodex/bin/python",
             "program": "${workspaceFolder}/example_grasp/plan_mogen_batch.py",
             "console": "integratedTerminal",
             "args": [
@@ -23,7 +23,7 @@
             "name": "plan_batch",
             "type": "debugpy",
             "request": "launch",
-            "python": "/home/wyt/miniconda3/envs/bodex/bin/python",
+            "python": "/home/wenke/anaconda3/envs/bodex/bin/python",
             "program": "${workspaceFolder}/example_grasp/plan_batch_env.py",
             "console": "integratedTerminal",
             "args": [
@@ -39,7 +39,7 @@
             "name": "visualize_npy",
             "type": "debugpy",
             "request": "launch",
-            "python": "/home/wyt/miniconda3/envs/bodex/bin/python",
+            "python": "/home/wenke/anaconda3/envs/bodex/bin/python",
             "program": "${workspaceFolder}/example_grasp/visualize_npy.py",
             "console": "integratedTerminal",
             "args": [
@@ -57,7 +57,7 @@
             "name": "plan_batch_graspnet",
             "type": "debugpy",
             "request": "launch",
-            "python": "/home/wyt/miniconda3/envs/bodex/bin/python",
+            "python": "/home/wenke/anaconda3/envs/bodex/bin/python",
             "program": "${workspaceFolder}/example_grasp/plan_batch_graspnet.py",
             "console": "integratedTerminal",
             "args": [

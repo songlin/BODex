@@ -76,7 +76,7 @@ if __name__ == "__main__":
         )
     elif args.mode == "mogen":
         manip_config_data["world"]["template_path"] = os.path.join(
-            "output", save_folder, "**/*_mogen.npy"
+            "output", save_folder, "*_mogen*.npy"
         )
     else:
         raise NotImplementedError
@@ -102,10 +102,16 @@ if __name__ == "__main__":
 
     tensor_args = TensorDeviceType()
 
-    for world_info_dict in world_generator:
-        if args.skip and save_helper.exist_piece(world_info_dict["save_prefix"]):
-            log_warn(f"skip {world_info_dict['save_prefix']}")
-            continue
+    for  i ,world_info_dict in enumerate(world_generator):
+        # if args.skip and save_helper.exist_piece(world_info_dict["save_prefix"]):
+        #     log_warn(f"skip {world_info_dict['save_prefix']}")
+        #     continue
         world_info_dict["robot_pose"] = tensor_args.to_device(world_info_dict["robot_pose"])
         world_info_dict["world_model"] = [WorldConfig.from_dict(world_info_dict["world_cfg"][0])]
         save_helper.save_piece(world_info_dict)
+        from pathlib import Path
+        old_file = Path(os.path.join("/home/wenke/BODex/src/curobo/content/assets/output/sim_dex3/right/dex3_debug/graspdata"),f'{world_info_dict["save_prefix"][0]}mogen.usda')
+
+        new_file = Path(os.path.join("/home/wenke/BODex/src/curobo/content/assets/output/sim_dex3/right/dex3_debug/graspdata",f"apple_mogen{i}.usda"))
+
+        old_file.rename(new_file)

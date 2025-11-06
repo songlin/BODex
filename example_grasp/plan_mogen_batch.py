@@ -169,7 +169,7 @@ if __name__ == "__main__":
             continue
         file_path=os.path.join(os.getcwd(), "coacd_0.05/coacd_merge.obj")
         urdf_path=os.path.join(os.getcwd(), "coacd_0.05/coacd.urdf")
-        obj_pose=_transform_to_robot_frame(np.array([0.4, 0, 0.04, 1, 0, 0, 0]))
+        obj_pose=_transform_to_robot_frame(np.array([0.4000000059604645, 0.0, 0.03657222166657448,0.6013860816541081, 9.584801678524222e-05, -0.0020859967168959104, -0.7989558312094444 ]))
         world_cfg=[{"mesh":{"apple":{
             "scale": np.array([1.0, 1.0, 1.0]),
             "pose": obj_pose,
@@ -351,9 +351,11 @@ if __name__ == "__main__":
         all_success = a_success & b_success & c_success
 
         robot_pose_traj = robot_pose_traj[all_success]
+        pregrasp_pose_qpos = pregrasp_pose_qpos[all_success]
+        grasp_pose_qpos = grasp_pose_qpos[all_success]
 
-        torch.save(pregrasp_pose_qpos[all_success], "pregrasp_pose_qpos.pt")
-        torch.save(grasp_pose_qpos[all_success], "grasp_pose_qpos.pt")
+        # torch.save(pregrasp_pose_qpos[all_success], "pregrasp_pose_qpos.pt")
+        # torch.save(grasp_pose_qpos[all_success], "grasp_pose_qpos.pt")
 
 
 
@@ -363,10 +365,18 @@ if __name__ == "__main__":
         # world_info_dict["robot_pose"] = robot_pose_traj.unsqueeze(0)
 
         for i in range(robot_pose_traj.shape[0]):
-            world_info_dict["robot_pose"] = robot_pose_traj[i:i+1].unsqueeze(0)
+            world_info_dict["robot_pose"] = robot_pose_traj[i].unsqueeze(0)
             save_mogen.save_piece(world_info_dict)
-            # break
+            from pathlib import Path
+
+            old_file = Path(os.path.join("/home/wenke/BODex/src/curobo/content/assets/output/sim_dex3/right/dex3_debug/graspdata"),f'{world_info_dict["save_prefix"][0]}mogen.npy')
+
+            new_file = Path(os.path.join("/home/wenke/BODex/src/curobo/content/assets/output/sim_dex3/right/dex3_debug/graspdata",f"apple_mogen{i}.npy"))
+            torch.save(pregrasp_pose_qpos[i], str(new_file).replace(".npy","_pregrasp.pt"))
+            torch.save(grasp_pose_qpos[i], str(new_file).replace(".npy",".pt"))
+            old_file.rename(new_file)
             pass
+        break
         # save_mogen.save_piece(world_info_dict)
         log_warn(f"Sinlge Time (mogen): {time.time()-smt}")
     log_warn(f"Total Time: {time.time()-tst}")
