@@ -10,7 +10,9 @@ robot_cfg:
         usd_path: null
         base_link: "pelvis"
         ee_link: "right_hand_palm_link" #left_wrist_yaw_link
-        link_names: ["left_wrist_yaw_link", "right_wrist_yaw_link", "right_hand_palm_link", "right_hand_index_1_link","right_hand_middle_1_link","right_hand_thumb_2_link"] # TODO "left_ankle_roll_link", "right_ankle_roll_link"
+        link_names: [ "right_hand_palm_link", "right_hand_index_1_link","right_hand_middle_1_link","right_hand_thumb_2_link",
+                     "left_ankle_roll_link", "right_ankle_roll_link", "left_hand_palm_link", "left_hand_thumb_2_link",
+                      "left_hand_index_1_link", "left_hand_middle_1_link"] # TODO "left_ankle_roll_link", "right_ankle_roll_link"
 
         # lock_joints: {"waist_yaw_joint": 0.0, "waist_roll_joint": 0.0, "waist_pitch_joint": 0.0}
 
@@ -143,22 +145,22 @@ robot_cfg:
 
         use_global_cumul: True
         mesh_link_names: [
-            # "left_hip_pitch_link",
-            # "left_hip_roll_link",
-            # "left_hip_yaw_link",
-            # "left_knee_link",
-            # "left_ankle_pitch_link",
-            # 'left_ankle_roll_link', 
+            "left_hip_pitch_link",
+            "left_hip_roll_link",
+            "left_hip_yaw_link",
+            "left_knee_link",
+            "left_ankle_pitch_link",
+            'left_ankle_roll_link', 
             
-            # 'right_hip_pitch_link',
-            # 'right_hip_roll_link', 
-            # 'right_hip_yaw_link',
-            # 'right_knee_link', 
-            # 'right_ankle_pitch_link', 
-            # 'right_ankle_roll_link', 
+            'right_hip_pitch_link',
+            'right_hip_roll_link', 
+            'right_hip_yaw_link',
+            'right_knee_link', 
+            'right_ankle_pitch_link', 
+            'right_ankle_roll_link', 
             
-            # 'waist_yaw_link', 
-            # 'waist_roll_link', 
+            'waist_yaw_link', 
+            'waist_roll_link', 
             # 'waist_pitch_link', 
             "torso_link",
             
@@ -169,8 +171,8 @@ robot_cfg:
             'left_wrist_roll_link', 
             'left_wrist_pitch_link', 
             'left_wrist_yaw_link', 
+
             'right_shoulder_pitch_link', 
-            
             'right_shoulder_roll_link', 
             'right_shoulder_yaw_link', 
             'right_elbow_link', 
@@ -222,8 +224,8 @@ robot_cfg:
                 'left_wrist_roll_joint', 
                 'left_wrist_pitch_joint', 
                 'left_wrist_yaw_joint', 
+
                 'right_shoulder_pitch_joint', 
-                
                 'right_shoulder_roll_joint', 
                 'right_shoulder_yaw_joint', 
                 'right_elbow_joint', 
@@ -248,6 +250,20 @@ robot_cfg:
                 "right_hand_index_1_joint" ,
 
             ] # List[str]
+
+            # retract_config: [0,0,0,
+            #                 0,0,0,0,0,0,0,
+            #                 0,0,0,0,0,0,0,]
+            # null_space_weight: [1.0,1.0,1.0,
+            #                     1.0,1.0,1.0,1.0,1.0,1.0,1.0,
+            #                     1.0,1.0,1.0,1.0,1.0,1.0,1.0,]
+            # cspace_distance_weight: [1.0,1.0,1.0,
+            #                         1.0,1.0,1.0,1.0,1.0,1.0,1.0,
+            #                         1.0,1.0,1.0,1.0,1.0,1.0,1.0,]
+            # max_jerk: 200.0
+            # max_acceleration: 10.0
+
+
             retract_config: [0,0,0,0,0,0,
                             0,0,0,0,0,0,
                             0,0,0,

@@ -1,12 +1,92 @@
 import numpy as np
 import transforms3d
 from glob import glob
-
+import os
+import trimesh
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.data._utils.collate import default_collate
-
+import random
 from curobo.util.logger import log_warn
 from curobo.util_file import load_json, load_scene_cfg, join_path, get_assets_path
+
+
+GraspNet_1B_Object_Names = {
+    0: "cracker box",
+    1: "sugar box",
+    2: "tomato soup can",
+    3: "mustard bottle",
+    4: "potted meat can",
+    5: "banana",
+    6: "bowl",
+    7: "mug", # "red mug", # 
+    8: "power drill",
+    9: "scissors",
+    10: "chips can", # "red chips can", #
+    11: "strawberry", 
+    12: "apple",
+    13: "lemon",
+    14: "peach",
+    15: "pear",
+    16: "orange",
+    17: "plum",
+    18: "knife", 
+    19: "blue screwdriver", #
+    20: "red screwdriver", #
+    21: "racquetball", 
+    22: "blue cup", #
+    23: "yellow cup", #
+    24: "airplane", # "toy airplane", 
+    25: "toy gun",  # 
+    26: "blue toy part", # workpiece
+    27: "metal screw", # 
+    28: "yellow propeller", # "yellow propeller", # 
+    29: "blue toy part a", #
+    30: "blue toy part b", #
+    31: "yellow toy part", # 
+    32: "padlock",
+    33: "toy dragon", # 
+    34: "small green bottle", # 
+    35: "cleansing foam",
+    36: "dabao wash soup",
+    37: "mouth rinse",
+    38: "dabao sod",
+    39: "soap box",
+    40: "kispa cleanser",
+    41: "darlie toothpaste",
+    42: "men oil control",
+    43: "marker",
+    44: "hosjam toothpaste",
+    45: "pitcher cap",
+    46: "green dish",
+    47: "white mouse",
+    48: "toy model", # 
+    49: "toy deer", # 
+    50: "toy zebra", # 
+    51: "toy large elephant", # 
+    52: "toy rhinocero", #
+    53: "toy small elephant", #
+    54: "toy monkey", #
+    55: "toy giraffe", #
+    56: "toy gorilla", #
+    57: "yellow snack box", #
+    58: "toothpaste box", #
+    59: "soap", 
+    60: "mouse", 
+    61: "dabao facewash", 
+    62: "pantene facewash", # "pantene facewash", #
+    63: "head shoulders supreme",
+    64: "thera med",
+    65: "dove", 
+    66: "head shoulder care",
+    67: "toy lion", # 
+    68: "coconut juice box", 
+    69: "toy hippo", # 
+    70: "tape",
+    71: "rubiks cube", 
+    72: "peeler cover",
+    73: "peeler",
+    74: "ice cube mould"
+}
 
 
 class GraspConfigDataset(Dataset):
@@ -27,6 +107,7 @@ class GraspConfigDataset(Dataset):
     def __getitem__(self, index):
         full_path = self.grasp_path_lst[index]
         cfg = np.load(full_path, allow_pickle=True).item()
+        
         scene_cfg = load_scene_cfg(cfg["scene_path"][0])
         for k, v in cfg.items():
             cfg[k] = v[0]
@@ -97,6 +178,57 @@ class WorldConfigDataset(Dataset):
             "save_prefix": f"{scene_id}_",
         }
 
+class GraspNetConfigDataset(Dataset):
+    def __init__(self, type, template_path, start, end):
+        assert type == "graspnet"
+
+        self.asset_path=os.path.join(os.getcwd(), template_path)
+        return
+
+    def __len__(self):
+        return len(GraspNet_1B_Object_Names)
+
+    def __getitem__(self, index):
+        obj_name = list(GraspNet_1B_Object_Names.values())[index]
+        obj_name = obj_name.replace(' ', '_')
+        obj_scale = np.array([1.0, 1.0, 1.0])
+        #FIXME only random selct one stable pose
+        obj_stable_poses=np.load(os.path.join(self.asset_path, f"stable/{index}_stable.npy"),allow_pickle=True)
+        obj_stable_pose= random.choice(obj_stable_poses)
+        
+        obj_file_path=os.path.join(self.asset_path, f"models/{index:03d}/coacd_0.05/coacd_merge.obj")
+
+        #compute gravity center and obb length
+        mesh = trimesh.load(obj_file_path, process=False)
+        v = mesh.vertices
+        gravity_center = np.array(v.mean(axis=0))
+        obb = v.max(axis=0) - v.min(axis=0)
+        obb_length = np.linalg.norm(obb) / 2
+
+        obj_rot = transforms3d.quaternions.quat2mat(obj_stable_pose[3:])
+        gravity_center = obj_stable_pose[:3] + obj_rot @ gravity_center * obj_scale
+
+        #world_cfg
+        world_cfg={}
+        world_cfg["mesh"]={}
+        world_cfg["mesh"][obj_name]={
+            "scale": obj_scale,
+            "pose": obj_stable_pose,
+            "file_path": obj_file_path,
+            "urdf_path": obj_file_path.replace("_merge.obj", ".urdf"),
+        }
+
+    
+
+
+        return {
+            "scene_path": f"/{obj_name}",
+            "world_cfg": world_cfg,
+            "manip_name": obj_name,
+            "obj_gravity_center": gravity_center,
+            "obj_obb_length": obb_length,
+            "save_prefix": f"{obj_name}/{obj_name}_",
+        }
 
 def _world_config_collate_fn(list_data):
     if "world_cfg" in list_data[0]:
@@ -114,6 +246,8 @@ def get_world_config_dataloader(configs, batch_size):
         dataset = WorldConfigDataset(**configs)
     elif configs["type"] == "grasp":
         dataset = GraspConfigDataset(**configs)
+    elif configs["type"] == "graspnet":
+        dataset = GraspNetConfigDataset(**configs)
     else:
         raise NotImplementedError
 

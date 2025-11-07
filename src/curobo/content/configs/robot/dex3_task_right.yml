@@ -24,7 +24,7 @@ robot_cfg:
     collision_spheres: spheres/dex3_right.yml
     
     # Primary end-effector (middle fingertip as reference)
-    ee_link: right_hand_thumb_2_link
+    ee_link: right_hand_palm_link
     
     # Contact points - fingertip links only
     link_names:

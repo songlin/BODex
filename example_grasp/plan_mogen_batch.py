@@ -264,13 +264,15 @@ if __name__ == "__main__":
             % (ik_result.success.int().sum() / len(ik_result.success))
         )
         log_warn(f"IK for Grasp Pose Failure: {torch.where(ik_result.success == 0)[0]}")
+        #TODO
         robot_pose_traj.append(
-            torch.cat([ik_result.solution, grasp_hand_qpos.unsqueeze(1)], dim=-1)
+            torch.cat([ik_result.solution, grasp_hand_qpos.unsqueeze(1),robot_pose_traj[-1][:,-1,17:].unsqueeze(1)], dim=-1)
         )
 
         # squeeze qpos
+        #TODO
         robot_pose_traj.append(
-            torch.cat([ik_result.solution, squeeze_hand_qpos.unsqueeze(1)], dim=-1)
+            torch.cat([ik_result.solution, squeeze_hand_qpos.unsqueeze(1),robot_pose_traj[-1][:,-1,17:].unsqueeze(1)], dim=-1)
         )
 
         # lift pose
@@ -284,8 +286,9 @@ if __name__ == "__main__":
         log_warn(
             "Lift IK Success rate: %.2f" % (ik_result.success.int().sum() / len(ik_result.success))
         )
+        #TODO
         robot_pose_traj.append(
-            torch.cat([ik_result.solution, squeeze_hand_qpos.unsqueeze(1)], dim=-1)
+            torch.cat([ik_result.solution, squeeze_hand_qpos.unsqueeze(1),robot_pose_traj[-1][:,-1,17:].unsqueeze(1)], dim=-1)
         )
         robot_pose_traj = torch.cat(robot_pose_traj, dim=1)
 

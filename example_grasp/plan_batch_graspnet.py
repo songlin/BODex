@@ -234,57 +234,33 @@ if __name__ == "__main__":
         if args.skip and save_helper.exist_piece(world_info_dict["save_prefix"]):
             log_warn(f"skip {world_info_dict['save_prefix']}")
             continue
-
-        file_path=os.path.join(os.getcwd(), "coacd_0.05/coacd_merge.obj")
-        urdf_path=os.path.join(os.getcwd(), "coacd_0.05/coacd.urdf")
-        obj_pose=_transform_to_robot_frame(np.array([-0.8, 0, 0.04, 1, 0, 0, 0]))
-        world_cfg=[{"mesh":{"apple":{
-            "scale": np.array([1.0, 1.0, 1.0]),
-            "pose": obj_pose,
-            "file_path": file_path,
-            "urdf_path": urdf_path,
-        }
-            
-        }}]
+  
 
         if grasp_solver is None:
-            # grasp_config = GraspSolverConfig.load_from_robot_config(
-            #     world_model=world_info_dict["world_cfg"],
-            #     manip_name_list=world_info_dict["manip_name"],
-            #     manip_config_data=manip_config_data,
-            #     obj_gravity_center=world_info_dict["obj_gravity_center"],
-            #     obj_obb_length=world_info_dict["obj_obb_length"],
-            #     use_cuda_graph=False,
-            #     store_debug=args.save_debug,
-            # )
-            
             grasp_config = GraspSolverConfig.load_from_robot_config(
-                world_model=world_cfg,
-                manip_name_list="apple",
+                world_model=world_info_dict["world_cfg"],
+                manip_name_list=world_info_dict["manip_name"],
                 manip_config_data=manip_config_data,
-                obj_gravity_center=torch.tensor([[0.0, 0.0, 0.02]]),
-                obj_obb_length=torch.tensor([0.04]),
+                obj_gravity_center=world_info_dict["obj_gravity_center"],
+                obj_obb_length=world_info_dict["obj_obb_length"],
                 use_cuda_graph=False,
                 store_debug=args.save_debug,
             )
+            
+            
             grasp_solver = GraspSolver(grasp_config)
             world_info_dict["world_model"] = grasp_solver.world_coll_checker.world_model
         else:
             world_info_dict["world_model"] = world_model = [
-                WorldConfig.from_dict(world_cfg) for world_cfg in world_cfg
+                WorldConfig.from_dict(world_cfg) for world_cfg in world_info_dict["world_cfg"]
             ]
-            # grasp_solver.update_world(
-            #     world_model,
-            #     world_info_dict["obj_gravity_center"],
-            #     world_info_dict["obj_obb_length"],
-            #     world_info_dict["manip_name"],
-            # )
             grasp_solver.update_world(
                 world_model,
-                torch.tensor([[0.0, 0.0, 0.02]]),
-                torch.tensor([0.04]),
-                'apple',
+                world_info_dict["obj_gravity_center"],
+                world_info_dict["obj_obb_length"],
+                world_info_dict["manip_name"],
             )
+          
 
         result = grasp_solver.solve_batch_env(return_seeds=grasp_solver.num_seeds)
 
@@ -308,11 +284,8 @@ if __name__ == "__main__":
                 [result.solution, squeeze_pose_qpos.unsqueeze(-2)], dim=-2
             )
             
-            world_info_dict['manip_name']='apple'
-            world_info_dict['obj_gravity_center'] = torch.tensor([[0.0, 0.0, 0.02]])
-            world_info_dict['obj_obb_length'] = torch.tensor([0.04])
-            # world_info_dict["save_prefix"] = 'apple'
-            world_info_dict['world_cfg'] = world_cfg
+            
+          
             world_info_dict["robot_pose"] = all_hand_pose_qpos
             world_info_dict["contact_point"] = result.contact_point
             world_info_dict["contact_frame"] = result.contact_frame
